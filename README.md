@@ -2,6 +2,8 @@
 Data Mining Assignment Phase 3
 
 1)  Exploratory Data Analysis
+Further details regarding the Exploratory Data Analysis can be found in the PDF file in this repository.
+
 Data Source
 UCI Machine Learning Repository: Occupancy Detection Data set
 http://archive.ics.uci.edu/ml/datasets/Occupancy+Detection+
