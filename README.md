@@ -24,7 +24,7 @@ not select it as a factor to build the model
 3) Choice of performance measures
 - We have decided on using data splitting to measure the accuracy ofr the Naive Bayes model. The data was split 70/30 in which 70% of the data was used as training data and 30% was used as test data. A Naive Bayes model was then created and trained. Results were then summarized in a Confusion Matrix. 
 
-4) Naive Bayes performave is as follows 
+4) Naive Bayes performance is as follows 
 
 Confusion Matrix and Statistics
 
