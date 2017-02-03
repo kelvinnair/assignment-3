@@ -1,7 +1,12 @@
 setwd("C:/Users/kelvi/OneDrive/Documents/Data Mining/Assignment Phase 3")
+
 #Preprocessing:
+
+#Please run this section of the code for every classifier
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 #Read txt file into Data Frame as table
-df <- read.table("datatest.txt", header = TRUE, sep = ",")
+df <- read.table("datatraining.txt", header = TRUE, sep = ",")
 
 #Remove the date column as it is only used for index purposes
 df$date <- NULL
@@ -14,6 +19,8 @@ df <- read.table("datatest.txt", header = TRUE, sep = ",", colClasses = colTypes
 #View attribute type
 str(df)
 View(df)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #DECISION TREE
 #Call the tree Library
@@ -39,14 +46,14 @@ output.tree.conf <- table(output.tree.predict, df$Occupancy)
 #Finding out the accuracy of the decision tree
 output.tree.accuracy <- sum(diag(output.tree.conf))/ sum(output.tree.conf)
 output.tree.accuracy
-#Accuracy is 0.9789869
+#Accuracy is 0.9789868668
 
 #NAIVE BAYES
 #Applying Naive Bayes using the e1071 library
 library(e1071)
-classifier <- naiveBayes(Occupancy ~ Temperature + Humidity + Light + CO2 + HumidityRatio, train)
+classifier <- naiveBayes(Occupancy ~ Temperature + Humidity + Light + CO2 + HumidityRatio, df)
 classifier
-prediction <- predict(classifier, train)
+prediction <- predict(classifier, df)
 prediction
 
 #Using Data Splitting to estimate Naive Bayes model accuracy
@@ -56,11 +63,13 @@ split=0.70
 trainIndex <- createDataPartition(df$Occupancy, p=split, list = FALSE)
 data_train <- df[trainIndex,]
 data_test <- df[-trainIndex,]
+data_test
 model <- NaiveBayes(Occupancy~.,data=data_train)
-x_test <- data_test[,1:5]
-y_test <- data_test[,6]
+x_test <- data_test[,1:6]
+y_test <- data_test[,7]
 predictions <- predict(model, x_test)
 confusionMatrix(predictions$class, y_test)
+#Accuracy: 0.9686717
 
 #ARTIFICIAL NEURAL NETWORK
 library(neuralnet)
