@@ -1,47 +1,48 @@
 setwd("C:/Users/kelvi/OneDrive/Documents/Data Mining/Assignment Phase 3")
-#Decision Trees
 #Preprocessing:
 #Read txt file into Data Frame as table
 df <- read.table("datatest.txt", header = TRUE, sep = ",")
-df2 <- read.table("datatest2.txt", header = TRUE, sep = ",")
 
 #Remove the date column as it is only used for index purposes
 df$date <- NULL
-df2$date <- NULL
+
 #Create a new value to convert "Occupancy" attribute from int to factor
 colTypes <- sapply(df, class)
 colTypes[6] <- "factor"
 df <- read.table("datatest.txt", header = TRUE, sep = ",", colClasses = colTypes, stringsAsFactors = FALSE)
-df2 <- read.table("datatest2.txt", header = TRUE, sep = ",", colClasses = colTypes, stringsAsFactors = FALSE)
 
 #View attribute type
 str(df)
-str(df2)
 View(df)
-#Call the RandomForest Library
-library(randomForest)
-#Apply RandomForest to obtain decision trees on datatest.txt
+
+#DECISION TREE
+#Call the tree Library
+library(tree)
 output.forest <- randomForest(Occupancy ~ Temperature + Humidity + Light + CO2 + HumidityRatio, data = df)
-print(output.forest)
-print(importance(output.forest, type = 2))
-#Apply RandomForest to obtain decision trees on datatest2.txt
-output.forest2 <- randomForest(Occupancy ~ Temperature + Humidity + Light + CO2 + HumidityRatio, data = df2)
-print(output.forest2)
-print(importance(output.forest, type = 2))
+output.tree <- tree::tree(Occupancy ~ Temperature + Humidity + Light + CO2 + HumidityRatio, data = df)
+output.tree
 
-#Naive Bayes
-#Preprocessing
-TrainData <- read.table("datatraining.txt", header = TRUE, sep = ",")
-TrainData$date <- NULL
-colTypes <- sapply(df, class)
-print(colTypes)
-colTypes[6] <- "factor"
-TrainData <- read.table("datatraining.txt", header = TRUE, sep = ",", colClasses = colTypes, stringsAsFactors = FALSE)
-train <- data.frame(TrainData)
-str(train)
-train$date <- NULL
+#Summary of Decision Tree
+summary(output.tree)
 
-#Applying Naive Bayes
+#Plotting the Decision Tree
+plot(output.tree)
+text(output.tree,pretty=0)
+
+#Creating a prediction value
+output.tree.predict <- predict(output.tree, df, type="class")
+output.tree.predict
+
+#Creating the confusion Matrix
+output.tree.conf <- table(output.tree.predict, df$Occupancy)
+
+#Finding out the accuracy of the decision tree
+output.tree.accuracy <- sum(diag(output.tree.conf))/ sum(output.tree.conf)
+output.tree.accuracy
+#Accuracy is 0.9789869
+
+#NAIVE BAYES
+#Applying Naive Bayes using the e1071 library
 library(e1071)
 classifier <- naiveBayes(Occupancy ~ Temperature + Humidity + Light + CO2 + HumidityRatio, train)
 classifier
@@ -60,3 +61,29 @@ x_test <- data_test[,1:5]
 y_test <- data_test[,6]
 predictions <- predict(model, x_test)
 confusionMatrix(predictions$class, y_test)
+
+#ARTIFICIAL NEURAL NETWORK
+library(neuralnet)
+#Obtain Max and Min of columns in dataframe
+maxs <- apply(df, 2, max)
+maxs
+mins <- apply(df, 2, min)
+mins
+
+#Scale data to normalize
+scale(df, center = mins, scale = maxs - mins)
+dfANN <- as.data.frame(scale(df, center = mins, scale = maxs - mins))
+dfANN
+
+#Creating the formula for ANN
+feats <- names(dfANN)
+#String Concatenate
+f <- paste(feats[1:5], collapse = ' + ')
+f <- paste(feats[6], ' ~ ', f)
+f
+f <- as.formula(f)
+
+#Creating the Artificial Neural Network
+neuralnetwork <- neuralnet(f, dfANN, hidden=c(10,10,10), linear.output = FALSE)
+neuralnetwork
+plot(neuralnetwork)
